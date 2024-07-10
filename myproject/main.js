@@ -1,8 +1,10 @@
 import * as THREE from
 
 "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js"
-import * as dat from 'dat.gui';
 
+import * as dat from 'dat.gui';
+import {OrbitControls} from 'https://unpkg.com/three@0.126.1/examples/jsm/controls/OrbitControls.js';
+console.log(OrbitControls)
 const gui = new dat.GUI();
 const world = {
  plane: {
@@ -29,7 +31,8 @@ function generate() {
     array[i + 2] = z + Math.random(); 
   }
 }
-
+const rayCaster = new THREE.Raycaster();
+console.log(rayCaster)
  const scene = new THREE.Scene();
  const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000);
  const renderer = new THREE.WebGLRenderer();
@@ -37,6 +40,7 @@ function generate() {
  renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(devicePixelRatio)
  document.body.appendChild(renderer.domElement);
+ new OrbitControls (camera,renderer.domElement)
 
  camera.position.z = 5;
 
@@ -52,14 +56,31 @@ for(let i = 0; i < array.length;  i +=3) {
   const z = array[i + 2];
   array[i + 2] = z + Math.random(); 
 }
+
+const mouse = {
+  X: undefined,
+  Y: undefined
+}
+addEventListener("mousemove", (e) => {
+  mouse.X = (e.clientX / innerWidth) * 2 - 1;
+  mouse.Y = -(e.clientY / innerHeight) * 2 + 1;
+  console.log(mouse);
+  
+})
+
+
 const light = new THREE.DirectionalLight(0xffffff ,1 );
 light.position.set(0,0,1);
 scene.add(light);
+const  backLight = new THREE.DirectionalLight(0xffffff ,1 );
+backLight.position.set(0,0, -1);
+scene.add(backLight);
 
 
  function animte() {
   requestAnimationFrame(animte);
  renderer.render(scene, camera);
   // planeMesh.rotation.x += 0.01;
- }
+  rayCaster.setFromCamera(mouse, camera);
+}
  animte();
